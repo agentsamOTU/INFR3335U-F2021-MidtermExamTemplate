@@ -20,6 +20,10 @@ public class PlayerScript : MonoBehaviour
 
     private Vector3 camToPlay;
 
+    private Vector3 for2d;
+
+    private Vector3 for2dhor;
+
     private int coinsCollected = 0;
     // Start is called before the first frame update
     void Start()
@@ -32,9 +36,14 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        dir = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
+        for2d = Vector3.Normalize(new Vector3(worldCamera.transform.forward.x,0.0f,worldCamera.transform.forward.z));
+        //dir = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
 
-        controller.Move(dir * speed);
+        for2dhor =UnityEngine.Quaternion.Euler(0.0f, 90.0f,0.0f)*for2d;
+
+        dir = for2d * Input.GetAxis("Vertical") + for2dhor*Input.GetAxis("Horizontal");
+
+        controller.Move(dir.normalized * speed);
     }
 
     private void OnTriggerEnter(Collider collide)
@@ -44,7 +53,10 @@ public class PlayerScript : MonoBehaviour
             Destroy(collide.gameObject);
             coinsCollected += 1;
             scoreCount.text ="Coins:\n"+ coinsCollected + "/10";
-
+            if(coinsCollected>=10)
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("End");
+            }
         }
     }
 }
